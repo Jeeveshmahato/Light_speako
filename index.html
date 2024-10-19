@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Background Removal API</title>
+  </head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    input {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    #result img {
+      margin-top: 20px;
+      max-width: 100%;
+    }
+  </style>
+  <body>
+    <div class="container">
+      <h1>Remove Image Background</h1>
+
+      <!-- Input for image URL -->
+      <input type="text" id="imageUrl" placeholder="Enter Image URL" />
+
+      <!-- Input for background color or code -->
+      <input
+        type="text"
+        id="bgColor"
+        placeholder="Enter Background Color (optional)"
+      />
+
+      <!-- Button to trigger API call -->
+      <button id="removeBgBtn">Remove Background</button>
+
+      <!-- Display the result -->
+      <div id="result">
+        <h3>Result:</h3>
+        <img
+          id="outputImage"
+          src=""
+          alt="Your processed image will appear here"
+        />
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("removeBgBtn")
+        .addEventListener("click", function () {
+          const imageUrl = document.getElementById("imageUrl").value;
+          const bgColor = document.getElementById("bgColor").value || null;
+
+          if (!imageUrl) {
+            alert("Please provide a valid image URL.");
+            return;
+          }
+
+          const apiKey = "22eccfafb6544c9a8b9b1fa539f64e54_03476e407bd74616a086eae85e9ea91d_andoraitools"; // Replace with your actual API key
+
+          // Prepend the CORS proxy URL to your API URL
+          const url = 'https://thingproxy.freeboard.io/fetch/https://api.lightxeditor.com/external/api/v1/remove-background';
+
+          const data = {
+            imageUrl: imageUrl,
+            background: bgColor || "transparent",
+          };
+
+          const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": apiKey,
+            },
+            body: JSON.stringify(data),
+          };
+
+          fetch(url, options)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  `Request failed with status code ${response.status}`
+                );
+              }
+              return response.json();
+            })
+            .then((data) => {
+              console.log("Request was successful!", data);
+
+              if (data.body.orderId) {
+                checkOrderStatus(data.body.orderId);
+              } else {
+                alert("Failed to get order ID.");
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
+    </script>
+  </body>
+</html>
